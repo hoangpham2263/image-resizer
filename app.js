@@ -150,7 +150,10 @@
         img.src = item.out ? item.out.url : item.srcUrl;
         img.className = "zoomable";
         img.title = t("preview");
-        img.onclick = () => {
+        // Click anywhere on the row (except its buttons) to preview
+        li.classList.add("zoomable");
+        li.onclick = (e) => {
+          if (e.target.closest("button")) return;
           const shown = state.items.map((i) => ({ src: i.out ? i.out.url : i.srcUrl, caption: i.out ? `${i.out.name} · ${i.out.w}×${i.out.h}` : i.file.name }));
           openPreview(shown, state.items.indexOf(item));
         };
