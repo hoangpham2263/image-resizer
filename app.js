@@ -15,7 +15,7 @@
       hintNone: "Giữ tỉ lệ gốc, chỉ đổi chiều rộng.",
       noUpscale: "Ảnh nhỏ hơn chiều rộng đã chọn sẽ giữ kích thước gốc.",
       downloadZip: "Tải tất cả (ZIP)", clear: "Xóa hết", download: "Tải", remove: "Xóa",
-      processing: "Đang xử lý…", error: "Không đọc được ảnh này", files: "ảnh",
+      preview: "Xem lớn", processing: "Đang xử lý…", error: "Không đọc được ảnh này", files: "ảnh",
       footer: "Làm bởi", switchTo: "EN", switchTitle: "English", zipName: "anh-da-doi-kich-thuoc",
     },
     en: {
@@ -29,7 +29,7 @@
       hintNone: "Keeps the original ratio and only changes the width.",
       noUpscale: "Images narrower than the chosen width keep their size.",
       downloadZip: "Download all (ZIP)", clear: "Clear", download: "Download", remove: "Remove",
-      processing: "Processing…", error: "Could not read this image", files: "images",
+      preview: "Preview", processing: "Processing…", error: "Could not read this image", files: "images",
       footer: "Made by", switchTo: "VI", switchTitle: "Tiếng Việt", zipName: "resized-images",
     },
   };
@@ -148,6 +148,12 @@
         const img = document.createElement("img");
         img.alt = "";
         img.src = item.out ? item.out.url : item.srcUrl;
+        img.className = "zoomable";
+        img.title = t("preview");
+        img.onclick = () => {
+          const shown = state.items.map((i) => ({ src: i.out ? i.out.url : i.srcUrl, caption: i.out ? `${i.out.name} · ${i.out.w}×${i.out.h}` : i.file.name }));
+          openPreview(shown, state.items.indexOf(item));
+        };
         const info = document.createElement("div");
         info.className = "info";
         const name = document.createElement("div");
