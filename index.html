@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Image Resizer – Đổi kích thước và cắt ảnh hàng loạt</title>
+    <meta name="description" content="Đổi kích thước và cắt ảnh hàng loạt theo tỉ lệ 1:1, 4:3, 16:9 hoặc chiều rộng cố định — hợp ảnh sản phẩm Shopee, WooCommerce. Chạy ngay trên trình duyệt." />
+    <link rel="icon" href="brand/favicon.ico" sizes="any" />
+    <link rel="icon" href="brand/hp-favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="brand/apple-touch-icon.png" />
+    <link rel="stylesheet" href="style.css?v=1" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="top">
+        <a class="brand" href="https://hoangpham.is-a.dev" title="HoangPham" aria-label="HoangPham"><img src="brand/hp-icon.svg" alt="HoangPham" width="40" height="40" /></a>
+        <div class="top-text">
+          <h1 data-i18n="title">Đổi kích thước ảnh</h1>
+          <p class="muted" data-i18n="subtitle"></p>
+        </div>
+        <div class="top-actions">
+          <a class="ghost back" href="https://hoangpham.is-a.dev/tools">← Portfolio</a>
+          <button id="lang" class="ghost" type="button" title="English">EN</button>
+          <a class="ghost" href="https://github.com/hoangpham2263/image-resizer" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </header>
+
+      <button id="drop" class="drop" type="button">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+        <strong data-i18n="drop">Kéo thả ảnh vào đây hoặc bấm để chọn</strong>
+        <span class="muted small" data-i18n="dropHint">JPG, PNG, WEBP, AVIF, GIF, BMP — chọn được nhiều ảnh, hoặc dán bằng Ctrl/Cmd + V.</span>
+      </button>
+      <input id="file" type="file" accept="image/*" multiple hidden />
+
+      <div class="convert">
+        <span class="label" data-i18n="ratio">Tỉ lệ khung</span>
+        <div class="seg" id="ratio">
+          <button type="button" data-ratio="0" class="active" data-i18n="original">Giữ nguyên</button>
+          <button type="button" data-ratio="1">1:1</button>
+          <button type="button" data-ratio="4/3">4:3</button>
+          <button type="button" data-ratio="3/4">3:4</button>
+          <button type="button" data-ratio="16/9">16:9</button>
+          <button type="button" data-ratio="9/16">9:16</button>
+        </div>
+        <div class="seg" id="fit" hidden>
+          <button type="button" data-fit="cover" class="active" data-i18n="cover">Cắt cho vừa khung</button>
+          <button type="button" data-fit="contain" data-i18n="contain">Giữ trọn ảnh, thêm nền</button>
+        </div>
+        <span class="label" data-i18n="width">Chiều rộng</span>
+        <div class="inline">
+          <div class="seg" id="width">
+            <button type="button" data-w="0" class="active" data-i18n="original">Giữ nguyên</button>
+            <button type="button" data-w="800">800px</button>
+            <button type="button" data-w="1000">1000px</button>
+            <button type="button" data-w="1200">1200px</button>
+            <button type="button" data-w="1600">1600px</button>
+          </div>
+          <input id="customW" type="number" min="16" max="8000" step="1" data-i18n-ph="custom" placeholder="Tự nhập" />
+        </div>
+        <span class="label" data-i18n="format">Định dạng</span>
+        <div class="seg" id="format">
+          <button type="button" data-f="keep" class="active" data-i18n="keep">Giữ nguyên</button>
+          <button type="button" data-f="image/jpeg">JPG</button>
+          <button type="button" data-f="image/webp">WEBP</button>
+          <button type="button" data-f="image/png">PNG</button>
+        </div>
+        <span class="label small" id="hint"></span>
+      </div>
+
+      <section id="result" hidden>
+        <div class="bar">
+          <p id="summary" class="muted"></p>
+          <div class="actions">
+            <button id="zip" class="primary" type="button" data-i18n="downloadZip">Tải tất cả (ZIP)</button>
+            <button id="clear" class="outline" type="button" data-i18n="clear">Xóa hết</button>
+          </div>
+        </div>
+        <ul id="list"></ul>
+      </section>
+
+      <details class="howto" lang="vi">
+        <summary>Công cụ hoạt động như thế nào?</summary>
+        <ol>
+          <li><b>Chọn ảnh:</b> kéo thả, bấm để chọn hoặc dán (Ctrl/Cmd + V), nhiều ảnh cùng lúc.</li>
+          <li><b>Chọn tỉ lệ khung:</b> 1:1 (ảnh sản phẩm Shopee, WooCommerce), 4:3, 3:4, 16:9 (banner), 9:16 (story). Chọn "Cắt cho vừa khung" để cắt phần thừa ở giữa ảnh, hoặc "Giữ trọn ảnh, thêm nền" để không mất chi tiết nào (nền trắng).</li>
+          <li><b>Chọn chiều rộng:</b> 800–1600px hoặc tự nhập; chiều cao tự tính theo tỉ lệ. Ảnh nhỏ hơn sẽ không bị phóng to.</li>
+          <li><b>Chọn định dạng</b> rồi tải từng ảnh hoặc tải tất cả (ZIP).</li>
+        </ol>
+        <p><b>Bên trong:</b> ảnh được vẽ lên canvas với kích thước mới rồi xuất lại (chất lượng 85%). Mọi thứ chạy trên máy bạn, ảnh không được tải lên đâu cả.</p>
+      </details>
+      <details class="howto" lang="en">
+        <summary>How does it work?</summary>
+        <ol>
+          <li><b>Add images:</b> drag and drop, click to choose, or paste (Ctrl/Cmd + V), many at once.</li>
+          <li><b>Pick a frame ratio:</b> 1:1 (product photos), 4:3, 3:4, 16:9 (banners), 9:16 (stories). "Crop to fill" trims the edges around the center; "Fit whole image" keeps everything and adds a white background.</li>
+          <li><b>Pick a width:</b> 800–1600px or type your own; height follows the ratio. Smaller images are never upscaled.</li>
+          <li><b>Pick a format</b>, then download one by one or all as a ZIP.</li>
+        </ol>
+        <p><b>Under the hood:</b> each image is drawn onto a canvas at the new size and re-exported (85% quality). Everything runs on your device; nothing is uploaded.</p>
+      </details>
+
+      <footer class="muted small">
+        <span data-i18n="footer">Làm bởi</span>
+        <a href="https://hoangpham.is-a.dev" target="_blank" rel="noopener">Phạm Quốc Hoàng</a> · MIT
+      </footer>
+    </main>
+    <script src="zip.js?v=1"></script>
+    <script src="app.js?v=1"></script>
+  </body>
+</html>
