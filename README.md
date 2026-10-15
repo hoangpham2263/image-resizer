@@ -4,7 +4,6 @@
 
 **Dùng thử:** https://hoangpham.is-a.dev/image-resizer/
 
-![Image Resizer](screenshot.webp)
 
 ## Tính năng
 
