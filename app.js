@@ -15,7 +15,7 @@
       hintNone: "Giữ tỉ lệ gốc, chỉ đổi chiều rộng.",
       noUpscale: "Ảnh nhỏ hơn chiều rộng đã chọn sẽ giữ kích thước gốc.",
       downloadZip: "Tải tất cả (ZIP)", clear: "Xóa hết", download: "Tải", remove: "Xóa",
-      preview: "Xem lớn", processing: "Đang xử lý…", error: "Không đọc được ảnh này", files: "ảnh",
+      preview: "Xem lớn", processing: "Đang xử lý…", run: "Đổi kích thước", pending: "Chờ xử lý", readyHint: "chọn tùy chọn rồi bấm Đổi kích thước", error: "Không đọc được ảnh này", files: "ảnh",
       footer: "Làm bởi", switchTo: "EN", switchTitle: "English", zipName: "anh-da-doi-kich-thuoc",
     },
     en: {
@@ -29,7 +29,7 @@
       hintNone: "Keeps the original ratio and only changes the width.",
       noUpscale: "Images narrower than the chosen width keep their size.",
       downloadZip: "Download all (ZIP)", clear: "Clear", download: "Download", remove: "Remove",
-      preview: "Preview", processing: "Processing…", error: "Could not read this image", files: "images",
+      preview: "Preview", processing: "Processing…", run: "Resize", pending: "Ready", readyHint: "pick options, then click Resize", error: "Could not read this image", files: "images",
       footer: "Made by", switchTo: "VI", switchTitle: "Tiếng Việt", zipName: "resized-images",
     },
   };
@@ -110,13 +110,26 @@
     return { blob, url: URL.createObjectURL(blob), w, h, name: `${base(item.file.name)}-${w}x${h}.${EXT[mime]}` };
   }
 
-  async function process() {
-    const run = ++state.run;
+  function clearOutputs() {
     state.items.forEach((i) => {
       if (i.out) URL.revokeObjectURL(i.out.url);
       i.out = undefined;
       i.error = undefined;
     });
+  }
+
+  // Options and new files only mark results as stale; work starts on the Resize button
+  function invalidate() {
+    state.run++;
+    state.running = false;
+    clearOutputs();
+    render();
+  }
+
+  async function process() {
+    const run = ++state.run;
+    state.running = true;
+    clearOutputs();
     render();
     for (const item of state.items) {
       try {
@@ -129,19 +142,26 @@
       }
       render();
     }
+    state.running = false;
+    render();
   }
 
   function render() {
     const { items } = state;
     $("result").hidden = items.length === 0;
     const done = items.filter((i) => i.out || i.error).length;
-    const busy = done < items.length;
+    const busy = state.running && done < items.length;
+    const pending = !state.running && done < items.length;
     const totalIn = items.reduce((s, i) => s + i.file.size, 0);
     const totalOut = items.reduce((s, i) => s + (i.out ? i.out.blob.size : 0), 0);
     $("summary").innerHTML = busy
       ? `${t("processing")} ${done}/${items.length}`
-      : `${items.length} ${t("files")} · ${formatBytes(totalIn)} → <b>${formatBytes(totalOut)}</b>`;
-    $("zip").disabled = busy;
+      : pending
+        ? `${items.length} ${t("files")} · ${t("readyHint")}`
+        : `${items.length} ${t("files")} · ${formatBytes(totalIn)} → <b>${formatBytes(totalOut)}</b>`;
+    $("zip").disabled = busy || pending;
+    $("run").disabled = busy || !items.length;
+    $("run").textContent = busy ? t("processing") : t("run");
     $("list").replaceChildren(
       ...items.map((item) => {
         const li = document.createElement("li");
@@ -168,7 +188,7 @@
           item.error ||
           (item.out
             ? `${item.w0}×${item.h0} → ${item.out.w}×${item.out.h} · ${formatBytes(item.file.size)} → ${formatBytes(item.out.blob.size)}`
-            : t("processing"));
+            : state.running ? t("processing") : t("pending"));
         info.append(name, meta);
         const btns = document.createElement("div");
         btns.className = "row-actions";
@@ -229,7 +249,7 @@
       } catch {}
     }
     state.items.push(...next);
-    process();
+    invalidate();
   }
 
   function sync() {
@@ -272,7 +292,7 @@
     if (!b) return;
     fn(b);
     sync();
-    process();
+    invalidate();
   });
   onSeg("ratio", (b) => (state.ratio = parseRatio(b.dataset.ratio)));
   onSeg("fit", (b) => (state.fit = b.dataset.fit));
@@ -282,9 +302,9 @@
     const v = Number(e.target.value);
     state.width = v >= 16 ? Math.min(8000, Math.round(v)) : 0;
     sync();
-    clearTimeout(state.timer);
-    state.timer = setTimeout(process, 300);
+    invalidate();
   };
+  $("run").onclick = () => process();
   $("zip").onclick = downloadZip;
   $("clear").onclick = () => {
     state.run++;
