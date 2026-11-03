@@ -1,24 +1,24 @@
 # Image Resizer
 
-Đổi kích thước và cắt ảnh hàng loạt ngay trên trình duyệt — ảnh không được tải lên server nào. Hợp ảnh sản phẩm Shopee, WooCommerce, banner, story.
+Resize and crop images in batches right in your browser. Nothing is uploaded to any server. Well suited to Shopee and WooCommerce product photos, banners and stories.
 
-**Dùng thử:** https://hoangpham.is-a.dev/image-resizer/
+**Try it:** https://hoangpham.is-a.dev/image-resizer/
 
 
-## Tính năng
+## Features
 
-- Nhiều ảnh cùng lúc: kéo thả, chọn file hoặc dán (Ctrl/Cmd + V)
-- Tỉ lệ khung: giữ nguyên, **1:1**, **4:3**, **3:4**, **16:9**, **9:16**
-  - **Cắt cho vừa khung:** cắt phần thừa quanh tâm ảnh
-  - **Giữ trọn ảnh, thêm nền:** không mất chi tiết, phần trống tô trắng
-- Chiều rộng: giữ nguyên, 800 / 1000 / 1200 / 1600px hoặc tự nhập — không phóng to ảnh nhỏ
-- Định dạng: giữ nguyên, JPG, WEBP, PNG (chất lượng 85%)
-- Tên file kèm kích thước mới (ví dụ `ao-thun-1000x1000.jpg`), tải từng ảnh hoặc ZIP
-- Giao diện tiếng Việt / English, hỗ trợ dark mode
+- Many images at once: drag and drop, file picker or paste (Ctrl/Cmd + V)
+- Aspect ratio: original, **1:1**, **4:3**, **3:4**, **16:9**, **9:16**
+  - **Crop to fit:** trims the excess around the center of the image
+  - **Fit the whole image, add background:** loses no detail, fills empty space with white
+- Width: original, 800 / 1000 / 1200 / 1600px or custom; small images are never upscaled
+- Format: original, JPG, WEBP, PNG (85% quality)
+- File names include the new size (for example `t-shirt-1000x1000.jpg`); download one by one or as a ZIP
+- Vietnamese / English interface, with dark mode
 
-## Cách hoạt động
+## How it works
 
-Ảnh được vẽ lên `<canvas>` theo kích thước và vùng cắt mới rồi xuất lại bằng `canvas.toBlob()`. ZIP tạo bằng `zip.js` tự viết. Không cần build — chỉ HTML, CSS, JavaScript.
+Images are drawn onto a `<canvas>` using the new size and crop area, then exported with `canvas.toBlob()`. ZIP files are created by a custom `zip.js`. No build step: just HTML, CSS and JavaScript.
 
 ```bash
 python3 -m http.server 8000
